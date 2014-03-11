@@ -56,14 +56,16 @@ describe Notifier::Slack do
     def expected_excon_params(_url, options, expected_payload, send_log = false)
       body        = Hash[URI.decode_www_form(options[:body])]
       payload     = JSON.parse(body["payload"])
-      attachments = payload["attachments"]
-      fields      = attachments.first["fields"]
-      titles      = fields.map { |h| h["title"] }
-
+      if send_log
+        attachments = payload["attachments"]
+        fields      = attachments.first["fields"]
+        titles      = fields.map { |h| h["title"] }
+      end
+      
       result   = _url == url
       result &&= options[:headers] == { 'Content-Type' => 'application/x-www-form-urlencoded' }
       result &&= options[:expects] == 200
-      result &&= attachments.size  == 1
+      result &&= attachments.size  == 1 if send_log
       result &&= titles            == send_log ? expected_titles_with_log : expected_titles
       expected_payload.each do |k, v|
         result &&= payload[k.to_s] == v

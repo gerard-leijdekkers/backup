@@ -69,7 +69,7 @@ module Backup
           data.merge!(param => val) if val
         end
 
-        data.merge!(:attachments => [attachment(status)])
+        data.merge!(:attachments => [attachment(status)]) if send_log_on.include?(status)
 
         options = {
           :headers  => { 'Content-Type' => 'application/x-www-form-urlencoded' },
